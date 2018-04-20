@@ -1,4 +1,4 @@
-- hosts: localhost
+- hosts: rataplan
   become: true
   tasks:
   - name: Install vim

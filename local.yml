@@ -1,5 +1,8 @@
 - hosts: localhost
   become: true
+  environment:
+    http_proxy: http://proxy.lbs.alcatel-lucent.com:8000/
+    https_proxy: http://proxy.lbs.alcatel-lucent.com:8000/
   tasks:
   - name: Update all packages to the latest version
     apt:
@@ -36,4 +39,48 @@
   - name: Add the user 'jheylen' to docker group
     user:
       name: jheylen
-      group: docker
+      groups: docker
+      append: yes
+  - name: various packets
+    apt:
+      name: "{{ item }}"
+    with_items:
+      - 'xfce4-terminal'
+      - 'openconnect'
+      - 'apt-file'
+      - 'silversearcher-ag'
+      - 'meld'
+      - 'build-essential'
+      - 'vlc'
+      - 'arandr'
+  - name: ansible config items require lxml
+    apt:
+      name: "{{ item }}"
+    with_items:
+      - 'python-lxml'
+# TODO: seems not up to date
+#  - name: install mercurial ppa
+#    apt_repository:
+#      repo: ppa:mercurial-ppa/releases
+  - name: install mercurial
+    apt:
+      name: mercurial
+      update_cache: yes
+  - name: install openssh server
+    apt:
+      name: openssh-server
+
+  - name: install wireshark
+    apt:
+      name: wireshark
+  - name: Set wireshark caps
+    capabilities:
+      path: /usr/bin/dumpcap
+      capability: "{{ item }}"
+      state: present
+    with_items:
+      - CAP_NET_RAW+eip
+      - CAP_NET_ADMIN+eip
+  - name: install qemu
+    apt:
+      name: qemu-system-x86

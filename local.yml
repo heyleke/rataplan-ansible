@@ -1,16 +1,11 @@
 - hosts: localhost
   become: true
-  environment:
-    http_proxy: http://proxy.lbs.alcatel-lucent.com:8000/
-    https_proxy: http://proxy.lbs.alcatel-lucent.com:8000/
   tasks:
   - name: Update all packages to the latest version
     apt:
       update_cache: yes
       cache_valid_time: 3600
 
-  - name: Install etckeeper
-    apt: name=etckeeper
   - name: Install vim
     apt: name=vim
   - name: Install docker ce requirements
@@ -36,28 +31,23 @@
     group:
       name: docker
       state: present
-  - name: Add the user 'jheylen' to docker group
+  - name: "Add the user {{ lookup('env','USER') }} to docker group"
     user:
-      name: jheylen
+      name: "{{ lookup('env','USER') }}"
       groups: docker
       append: yes
   - name: various packets
     apt:
       name: "{{ item }}"
     with_items:
-      - 'xfce4-terminal'
       - 'openconnect'
+      - 'stoken'
       - 'apt-file'
       - 'silversearcher-ag'
       - 'meld'
       - 'build-essential'
       - 'vlc'
       - 'arandr'
-  - name: ansible config items require lxml
-    apt:
-      name: "{{ item }}"
-    with_items:
-      - 'python-lxml'
 # TODO: seems not up to date
 #  - name: install mercurial ppa
 #    apt_repository:
